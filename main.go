@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -20,17 +21,31 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// fmt.Println(string(res))
-	f, err := os.Create("data.txt")
+	err = saveJson(string(res))
 	if err != nil {
-		fmt.Println("failed fetching", err)
-	}
-	defer f.Close()
-
-	_, err = f.WriteString(string(res))
-	if err != nil {
-		log.Fatal(err)
+		fmt.Println("save file problem")
+		return
 	}
 
 	fmt.Println("successfuly written string")
+}
+
+func saveJson(data string) error {
+	saveFile, err := os.Create("data.json")
+	if err != nil {
+		fmt.Println("error creating file: ", err)
+		return err
+	}
+
+	defer saveFile.Close()
+
+	encoder := json.NewEncoder(saveFile)
+	err = encoder.Encode(data)
+	if err != nil {
+		fmt.Println("error encoding data: ", err)
+		return err
+	}
+
+	return nil
+
 }
